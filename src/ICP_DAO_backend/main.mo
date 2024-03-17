@@ -36,7 +36,6 @@ actor SimpleDAO {
 
       updateMembers(selectedCandidates);
     };
-
   };
 
   // Update DAO members
@@ -44,4 +43,8 @@ actor SimpleDAO {
     members := Array.filter(candidates, func(_ : Principal) : Bool { true });
     emitMembersUpdated(members);
   };
+
+  public func getMemebers() : async [Principal] {
+    return members;
+  }
 };

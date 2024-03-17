@@ -3,39 +3,57 @@ import { Principal } from '@dfinity/principal';
 import { ICP_DAO_backend } from 'declarations/ICP_DAO_backend';
 
 function App() {
-  const [candidatePrincipals, setCandidatePrincipals] = useState('');
-  const [status, setStatus] = useState('');
+  const [candidates, setCandidates] = useState('');
+  const [membersUpdated, setMembersUpdated] = useState(false);
+  const [members, setMembers] = useState([]);
 
-  const handleInputChange = (event) => {
-    setCandidatePrincipals(event.target.value);
+  const handleCandidatesSubmit = async (event) => {
+    event.preventDefault();
+    const candidatesArray = candidates.split(',').map(candidate => Principal.fromText(candidate.trim()));
+    try {
+      await ICP_DAO_backend.createDAOIfLucky(candidatesArray);
+      const updatedMembers = await ICP_DAO_backend.getMembers(); // Assuming getMembers is a method that retrieves the current DAO members.
+      setMembers(updatedMembers);
+      setMembersUpdated(true);
+    } catch (error) {
+      console.error("Failed to create DAO or update members:", error);
+      setMembersUpdated(false);
+    }
   };
 
-  const createDAOIfLucky = async () => {
-    try {
-      const candidates = candidatePrincipals.split(',').map(Principal.fromText);
-      await ICP_DAO_backend.createDAOIfLucky(candidates);
-      setStatus('DAO creation attempted.');
-    } catch (error) {
-      console.error('Error calling createDAOIfLucky:', error);
-      setStatus(`Error: ${error.message}`);
-    }
+  const handleCandidatesChange = (event) => {
+    setCandidates(event.target.value);
+    setMembersUpdated(false); // Reset this flag when user changes input
   };
 
   return (
     <main>
-       <div>
-      <h1>Simple DAO Creator</h1>
-      <input
-        type="text"
-        value={candidatePrincipals}
-        onChange={handleInputChange}
-        placeholder="Enter candidate principals separated by comma"
-      />
-      <button onClick={createDAOIfLucky}>Create DAO If Lucky</button>
-      <p>{status}</p>
-    </div>
+      <img src="/logo2.svg" alt="DFINITY logo" />
+      <br /><br />
+      <form onSubmit={handleCandidatesSubmit}>
+        <label htmlFor="candidates">Enter candidate Principals (comma separated): &nbsp;</label>
+        <input 
+          id="candidates" 
+          type="text" 
+          value={candidates} 
+          onChange={handleCandidatesChange} 
+          placeholder="principal1,principal2,..."
+        />
+        <button type="submit">Try Creating DAO</button>
+      </form>
+      {membersUpdated && (
+        <section id="members">
+          <h3>DAO Members:</h3>
+          <ul>
+            {members.map((member, index) => (
+              <li key={index}>{member.toString()}</li>
+            ))}
+          </ul>
+        </section>
+      )}
     </main>
   );
 }
+
 
 export default App;
