@@ -44,7 +44,7 @@ actor SimpleDAO {
     emitMembersUpdated(members);
   };
 
-  public func getMemebers() : async [Principal] {
+  public func getMembers() : async [Principal] {
     return members;
   }
 };

@@ -13,6 +13,7 @@ function App() {
     try {
       await ICP_DAO_backend.createDAOIfLucky(candidatesArray);
       const updatedMembers = await ICP_DAO_backend.getMembers(); // Assuming getMembers is a method that retrieves the current DAO members.
+      console.log(updatedMembers);
       setMembers(updatedMembers);
       setMembersUpdated(true);
     } catch (error) {
@@ -23,6 +24,8 @@ function App() {
 
   const handleCandidatesChange = (event) => {
     setCandidates(event.target.value);
+    let c = candidates.split(',').map(candidate => Principal.fromText(candidate.trim()));
+    console.log(c);
     setMembersUpdated(false); // Reset this flag when user changes input
   };
 
