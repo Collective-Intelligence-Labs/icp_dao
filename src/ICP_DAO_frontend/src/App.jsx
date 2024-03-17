@@ -1,29 +1,39 @@
 import { useState } from 'react';
+import { Principal } from '@dfinity/principal';
 import { ICP_DAO_backend } from 'declarations/ICP_DAO_backend';
 
 function App() {
-  const [greeting, setGreeting] = useState('');
+  const [candidatePrincipals, setCandidatePrincipals] = useState('');
+  const [status, setStatus] = useState('');
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    ICP_DAO_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
-    return false;
-  }
+  const handleInputChange = (event) => {
+    setCandidatePrincipals(event.target.value);
+  };
+
+  const createDAOIfLucky = async () => {
+    try {
+      const candidates = candidatePrincipals.split(',').map(Principal.fromText);
+      await ICP_DAO_backend.createDAOIfLucky(candidates);
+      setStatus('DAO creation attempted.');
+    } catch (error) {
+      console.error('Error calling createDAOIfLucky:', error);
+      setStatus(`Error: ${error.message}`);
+    }
+  };
 
   return (
     <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
-      <form action="#" onSubmit={handleSubmit}>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <section id="greeting">{greeting}</section>
+       <div>
+      <h1>Simple DAO Creator</h1>
+      <input
+        type="text"
+        value={candidatePrincipals}
+        onChange={handleInputChange}
+        placeholder="Enter candidate principals separated by comma"
+      />
+      <button onClick={createDAOIfLucky}>Create DAO If Lucky</button>
+      <p>{status}</p>
+    </div>
     </main>
   );
 }

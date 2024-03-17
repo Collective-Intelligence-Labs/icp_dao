@@ -14,5 +14,8 @@
   "type": "module",
   "workspaces": [
     "src/ICP_DAO_frontend"
-  ]
+  ],
+  "dependencies": {
+    "@dfinity/principal": "^1.0.1"
+  }
 }
